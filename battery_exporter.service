@@ -1,0 +1,10 @@
+[Unit]
+Description = battery exporter
+
+[Service]
+ExecStart = /usr/local/bin/battery_exporter.exe
+Restart = always
+Type = simple
+
+[Install]
+WantedBy = multi-user.target
