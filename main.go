@@ -110,7 +110,8 @@ func collectBattery() {
 
 		temp, err := battery.GetBatteryTemperature(handle)
 		if err != nil {
-			log.Printf("[error] GetBatteryTemperature: %s", err)
+			// disable noisy log
+			//log.Printf("[error] GetBatteryTemperature: %s", err)
 		} else {
 			temperatureGauge.With(prometheus.Labels{"id": id}).Set(temp)
 		}
