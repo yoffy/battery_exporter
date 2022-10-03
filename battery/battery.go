@@ -165,7 +165,7 @@ func OpenBatteryHandle(index int) (*Handle, error) {
 	}, nil
 }
 
-func CloseBatteryHandle(handle Handle) {
+func CloseBatteryHandle(handle *Handle) {
 	syscall.CloseHandle(handle.BatteryHandle)
 }
 
@@ -233,7 +233,7 @@ func GetBatteryUniqueId(handle *Handle) (string, error) {
 		return "", err
 	}
 
-	id := escape(name, int(numOutBytes/2) - 1)
+	id := escape(name, int(numOutBytes/2)-1)
 
 	return syscall.UTF16ToString(id), nil
 }

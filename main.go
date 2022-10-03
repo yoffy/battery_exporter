@@ -87,11 +87,21 @@ func discoverBatteries() {
 	}
 }
 
+func closeBatteries() {
+	for id, handle := range g_BatteryHandles {
+		battery.CloseBatteryHandle(handle)
+		delete(g_BatteryHandles, id)
+	}
+}
+
 func collectBattery() {
+	hasError := false
+
 	for id, handle := range g_BatteryHandles {
 		info, err := battery.GetBatteryInfo(handle)
 		if err != nil {
 			log.Printf("[error] GetBatteryInfo: %s", err)
+			hasError = true
 		} else {
 			designedCapacityGauge.With(prometheus.Labels{"id": id}).Set(float64(info.DesignedCapacity) / 1000.0)
 			fullChargedCapacityGauge.With(prometheus.Labels{"id": id}).Set(float64(info.FullChargedCapacity) / 1000.0)
@@ -101,6 +111,7 @@ func collectBattery() {
 		status, err := battery.GetBatteryStatus(handle)
 		if err != nil {
 			log.Printf("[error] GetBatteryStatus: %s", err)
+			hasError = true
 		} else {
 			powerStateGauge.With(prometheus.Labels{"id": id}).Set(float64(status.PowerState))
 			availableGauge.With(prometheus.Labels{"id": id}).Set(float64(status.Capacity) / 1000.0)
@@ -115,6 +126,12 @@ func collectBattery() {
 		} else {
 			temperatureGauge.With(prometheus.Labels{"id": id}).Set(temp)
 		}
+	}
+
+	if hasError {
+		log.Println("re-discovering batteries")
+		closeBatteries()
+		discoverBatteries()
 	}
 }
 
