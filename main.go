@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -116,6 +117,9 @@ func collectBattery() {
 			powerStateGauge.With(prometheus.Labels{"id": id}).Set(float64(status.PowerState))
 			availableGauge.With(prometheus.Labels{"id": id}).Set(float64(status.Capacity) / 1000.0)
 			voltageGauge.With(prometheus.Labels{"id": id}).Set(float64(status.Voltage) / 1000.0)
+			if math.Abs(float64(status.Rate)) >= 1000000 {
+				status.Rate = 0
+			}
 			rateGauge.With(prometheus.Labels{"id": id}).Set(float64(status.Rate) / 1000.0)
 		}
 
